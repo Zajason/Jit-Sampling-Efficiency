@@ -1,0 +1,11 @@
+{
+  "description": "2000 balanced samples per selected configuration; FID is screening evidence only",
+  "samples": 2000,
+  "batch_size": 4,
+  "seed": 20261106,
+  "warmup": 2,
+  "repeats": 7,
+  "precision": "bf16",
+  "cfg": 3.0,
+  "configurations": ["heun_50", "euler_50", "ab2_50"]
+}

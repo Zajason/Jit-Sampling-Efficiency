@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jit-sampling-efficiency"
+version = "0.1.0"
+description = "A small, reproducible numerical-sampling pilot using official JiT"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.7", "numpy>=1.26", "Pillow>=10", "einops>=0.8"]
+
+[project.optional-dependencies]
+perceptual = ["lpips>=0.1.4", "torchvision>=0.22"]
+proposal = ["reportlab>=4"]
+
+[project.scripts]
+jit-pilot = "jit_pilot.run:main"
+jit-pilot-fid = "jit_pilot.fid:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

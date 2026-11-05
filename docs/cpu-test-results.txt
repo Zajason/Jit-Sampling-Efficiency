@@ -1,0 +1,13 @@
+test_first_ema_overrides_parameters_and_base_buffers_survive (test_checkpoint.CheckpointTests.test_first_ema_overrides_parameters_and_base_buffers_survive) ... ok
+test_raw_weights_and_missing_ema_are_rejected (test_checkpoint.CheckpointTests.test_raw_weights_and_missing_ema_are_rejected) ... ok
+test_euler_heun_match_official_generate (test_samplers.OfficialParityTests.test_euler_heun_match_official_generate) ... ok
+test_instrumented_call_counts_and_noise_preservation (test_samplers.OfficialParityTests.test_instrumented_call_counts_and_noise_preservation) ... ok
+test_ab2_integrates_linear_time_velocity_on_variable_grid (test_samplers.SamplerTests.test_ab2_integrates_linear_time_velocity_on_variable_grid) ... ok
+test_ab2_second_order_convergence (test_samplers.SamplerTests.test_ab2_second_order_convergence) ... ok
+test_output_rounding_and_nonfinite_rejection (test_samplers.SamplerTests.test_output_rounding_and_nonfinite_rejection) ... ok
+test_pairing_independent_of_batch_boundaries (test_samplers.SamplerTests.test_pairing_independent_of_batch_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 4.438s
+
+OK

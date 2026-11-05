@@ -1,0 +1,11 @@
+{
+  "description": "64 paired samples; uniform steps; no schedule or guidance tuning",
+  "samples": 64,
+  "batch_size": 4,
+  "seed": 20261105,
+  "warmup": 2,
+  "repeats": 7,
+  "precision": "bf16",
+  "cfg": 3.0,
+  "configurations": ["heun_50", "heun_25", "euler_50", "euler_25", "ab2_50", "ab2_25"]
+}

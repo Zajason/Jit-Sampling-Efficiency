@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/LTH14/JiT",
+  "revision": "cbc743a2ada5e9762697da2c83f8c4f8379e8c17",
+  "files": {
+    "denoiser.py": "3649319428f758080828b164266284a75dcd73b53ce81827302be0824bca91a4",
+    "model_jit.py": "0293a23c01312317701c96704b85e7fe00b15d9261aa845731ea434103fd7563",
+    "util/model_util.py": "f4f35cc86a41b374d9e3654c8a2cddc12fbb11d41a28d24f05cf667c008b912e",
+    "main_jit.py": "00bf2423d4b28a66748a1d7695b392687e7fe32c032d61c47710f010740ce6c2",
+    "engine_jit.py": "f3ef5b5df80734a4033da7e613325f7be5ef187c582dba1ea59d169ce1fbb3ce",
+    "README.md": "1015d58695f22f3a3096549484413de87b76e9b9ae30e913fb15a34ccfcc12ef",
+    "LICENSE": "27658d5a15c520f7029fd1218696517e8d6b362c10d11c7e2a8e1977a0d7beb8",
+    "fid_stats/jit_in256_stats.npz": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c"
+  }
+}
