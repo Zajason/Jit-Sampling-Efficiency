@@ -1,0 +1,3 @@
+# Preserve archived generated evidence verbatim, including CSV CRLF and SVG spacing.
+docs/experiment-artifacts/**/*.csv -whitespace
+docs/experiment-artifacts/**/*.svg -whitespace

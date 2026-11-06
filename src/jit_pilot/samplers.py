@@ -1,5 +1,6 @@
 """Keep official Euler/Heun step functions unchanged; add only an AB2 loop."""
 from dataclasses import dataclass
+import math
 import torch
 
 @dataclass(frozen=True)
@@ -7,6 +8,13 @@ class Configuration:
     name: str
     method: str
     steps: int
+    schedule_power: float = 1.0
+
+    def __post_init__(self):
+        if self.method not in {'euler', 'heun', 'ab2'} or self.steps < 1:
+            raise ValueError('Invalid solver or step count')
+        if not math.isfinite(self.schedule_power) or self.schedule_power <= 0:
+            raise ValueError('Schedule power must be finite and positive')
 
 CONFIGS = tuple(Configuration(f"{method}_{steps}", method, steps)
                 for method, steps in [("heun",50),("heun",25),("euler",50),
@@ -29,6 +37,11 @@ def sample(model, noise, labels, config):
     # Same uniform grid, state dtype and endpoint convention as Denoiser.generate.
     z = noise.clone()
     times = torch.linspace(0., 1., config.steps + 1, device=z.device)
+    # Explicit addition for schedule ablations. The uniform reference is untouched.
+    if config.schedule_power != 1.0:
+        times = times.pow(config.schedule_power)
+    if not torch.all(times[1:] > times[:-1]):
+        raise ValueError('Timesteps must be strictly increasing')
     times = times.view(-1, *([1] * z.ndim)).expand(-1, len(labels), -1, -1, -1)
     previous = previous_step = None
     for i in range(config.steps):

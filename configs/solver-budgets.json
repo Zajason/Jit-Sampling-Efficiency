@@ -1,0 +1,172 @@
+{
+  "description": "Proposal uniform solver comparison at 10,20,30,50,100 sample-equivalent passes, plus official Heun-50 reference. Balanced screening only.",
+  "samples": 2000,
+  "batch_size": 4,
+  "seed": 20261106,
+  "warmup": 2,
+  "repeats": 7,
+  "precision": "bf16",
+  "cfg": 3.0,
+  "configurations": [
+    "heun_50",
+    "euler_5",
+    "euler_10",
+    "euler_15",
+    "euler_25",
+    "euler_50",
+    "heun_3",
+    "heun_5",
+    "heun_8",
+    "heun_13",
+    "heun_25",
+    "ab2_5",
+    "ab2_10",
+    "ab2_15",
+    "ab2_25",
+    "ab2_50"
+  ],
+  "additional_configurations": [
+    {
+      "name": "euler_5",
+      "method": "euler",
+      "steps": 5
+    },
+    {
+      "name": "euler_10",
+      "method": "euler",
+      "steps": 10
+    },
+    {
+      "name": "euler_15",
+      "method": "euler",
+      "steps": 15
+    },
+    {
+      "name": "heun_3",
+      "method": "heun",
+      "steps": 3
+    },
+    {
+      "name": "heun_5",
+      "method": "heun",
+      "steps": 5
+    },
+    {
+      "name": "heun_8",
+      "method": "heun",
+      "steps": 8
+    },
+    {
+      "name": "heun_13",
+      "method": "heun",
+      "steps": 13
+    },
+    {
+      "name": "ab2_5",
+      "method": "ab2",
+      "steps": 5
+    },
+    {
+      "name": "ab2_10",
+      "method": "ab2",
+      "steps": 10
+    },
+    {
+      "name": "ab2_15",
+      "method": "ab2",
+      "steps": 15
+    }
+  ],
+  "budget_mapping": [
+    {
+      "method": "euler",
+      "nominal_pass_budget": 10,
+      "configuration": "euler_5",
+      "realized_passes": 10
+    },
+    {
+      "method": "euler",
+      "nominal_pass_budget": 20,
+      "configuration": "euler_10",
+      "realized_passes": 20
+    },
+    {
+      "method": "euler",
+      "nominal_pass_budget": 30,
+      "configuration": "euler_15",
+      "realized_passes": 30
+    },
+    {
+      "method": "euler",
+      "nominal_pass_budget": 50,
+      "configuration": "euler_25",
+      "realized_passes": 50
+    },
+    {
+      "method": "euler",
+      "nominal_pass_budget": 100,
+      "configuration": "euler_50",
+      "realized_passes": 100
+    },
+    {
+      "method": "heun",
+      "nominal_pass_budget": 10,
+      "configuration": "heun_3",
+      "realized_passes": 10
+    },
+    {
+      "method": "heun",
+      "nominal_pass_budget": 20,
+      "configuration": "heun_5",
+      "realized_passes": 18
+    },
+    {
+      "method": "heun",
+      "nominal_pass_budget": 30,
+      "configuration": "heun_8",
+      "realized_passes": 30
+    },
+    {
+      "method": "heun",
+      "nominal_pass_budget": 50,
+      "configuration": "heun_13",
+      "realized_passes": 50
+    },
+    {
+      "method": "heun",
+      "nominal_pass_budget": 100,
+      "configuration": "heun_25",
+      "realized_passes": 98
+    },
+    {
+      "method": "ab2",
+      "nominal_pass_budget": 10,
+      "configuration": "ab2_5",
+      "realized_passes": 10
+    },
+    {
+      "method": "ab2",
+      "nominal_pass_budget": 20,
+      "configuration": "ab2_10",
+      "realized_passes": 20
+    },
+    {
+      "method": "ab2",
+      "nominal_pass_budget": 30,
+      "configuration": "ab2_15",
+      "realized_passes": 30
+    },
+    {
+      "method": "ab2",
+      "nominal_pass_budget": 50,
+      "configuration": "ab2_25",
+      "realized_passes": 50
+    },
+    {
+      "method": "ab2",
+      "nominal_pass_budget": 100,
+      "configuration": "ab2_50",
+      "realized_passes": 100
+    }
+  ]
+}

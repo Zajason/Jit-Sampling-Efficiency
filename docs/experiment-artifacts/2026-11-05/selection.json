@@ -1,0 +1,89 @@
+{
+  "uniform_candidate": {
+    "configuration": "euler_25",
+    "steps": "25",
+    "schedule_power": "1.0",
+    "actual_forward_calls_per_batch": "50",
+    "network_passes_per_image": "50",
+    "guided_velocity_evaluations": "25",
+    "batch_size": "4",
+    "median_batch_ms": "269.1894229938043",
+    "batch_ms_p25": "266.50129049812676",
+    "batch_ms_p75": "272.859138000058",
+    "amortized_ms_per_image": "67.29735574845108",
+    "speedup_vs_heun_50": "4.0333362170160285",
+    "peak_allocated_gib": "0.5698885917663574",
+    "paired_pixel_rmse_0_1": "0.11087631640898908",
+    "paired_lpips_alex": "",
+    "fid": 20.403860434844432
+  },
+  "screen_reference": {
+    "configuration": "heun_50",
+    "steps": "50",
+    "schedule_power": "1.0",
+    "actual_forward_calls_per_batch": "198",
+    "network_passes_per_image": "198",
+    "guided_velocity_evaluations": "99",
+    "batch_size": "4",
+    "median_batch_ms": "1085.7314489985583",
+    "batch_ms_p25": "1074.1516374910134",
+    "batch_ms_p75": "1099.355910497252",
+    "amortized_ms_per_image": "271.4328622496396",
+    "speedup_vs_heun_50": "1.0",
+    "peak_allocated_gib": "0.5762057304382324",
+    "paired_pixel_rmse_0_1": "0.0",
+    "paired_lpips_alex": "",
+    "fid": 19.2231554556962
+  },
+  "uniform_selection_rule": "fastest within 1.10x reference screen FID, otherwise lowest FID",
+  "schedule_solver": {
+    "name": "ab2_25",
+    "method": "ab2",
+    "steps": 25,
+    "schedule_power": 1.0
+  },
+  "schedule_validation_winner": {
+    "configuration": "ab2_25",
+    "steps": "25",
+    "schedule_power": "1.0",
+    "actual_forward_calls_per_batch": "50",
+    "network_passes_per_image": "50",
+    "guided_velocity_evaluations": "25",
+    "batch_size": "4",
+    "median_batch_ms": "270.47689599567093",
+    "batch_ms_p25": "270.27255199936917",
+    "batch_ms_p75": "274.22639499854995",
+    "amortized_ms_per_image": "67.61922399891773",
+    "speedup_vs_heun_50": "3.972939322776164",
+    "peak_allocated_gib": "0.5735516548156738",
+    "paired_pixel_rmse_0_1": "0.09076494956742147",
+    "paired_lpips_alex": "",
+    "fid": 19.43945617388391
+  },
+  "finalists": [
+    {
+      "name": "heun_50",
+      "method": "heun",
+      "steps": 50,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_25",
+      "method": "euler",
+      "steps": 25,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_25",
+      "method": "ab2",
+      "steps": 25,
+      "schedule_power": 1.0
+    }
+  ],
+  "final_seeds": [
+    20281106,
+    20291106
+  ],
+  "samples_per_configuration_per_repeat": 5000,
+  "frozen_at": "2026-11-05T21:24:42.882410+00:00"
+}

@@ -1,0 +1,345 @@
+{
+  "status": "complete",
+  "settings": {
+    "description": "Proposal uniform solver comparison at 10,20,30,50,100 sample-equivalent passes, plus official Heun-50 reference. Balanced screening only.",
+    "samples": 2000,
+    "batch_size": 4,
+    "seed": 20261106,
+    "warmup": 2,
+    "repeats": 7,
+    "precision": "bf16",
+    "cfg": 3.0,
+    "configurations": [
+      "heun_50",
+      "euler_5",
+      "euler_10",
+      "euler_15",
+      "euler_25",
+      "euler_50",
+      "heun_3",
+      "heun_5",
+      "heun_8",
+      "heun_13",
+      "heun_25",
+      "ab2_5",
+      "ab2_10",
+      "ab2_15",
+      "ab2_25",
+      "ab2_50"
+    ],
+    "additional_configurations": [
+      {
+        "name": "euler_5",
+        "method": "euler",
+        "steps": 5
+      },
+      {
+        "name": "euler_10",
+        "method": "euler",
+        "steps": 10
+      },
+      {
+        "name": "euler_15",
+        "method": "euler",
+        "steps": 15
+      },
+      {
+        "name": "heun_3",
+        "method": "heun",
+        "steps": 3
+      },
+      {
+        "name": "heun_5",
+        "method": "heun",
+        "steps": 5
+      },
+      {
+        "name": "heun_8",
+        "method": "heun",
+        "steps": 8
+      },
+      {
+        "name": "heun_13",
+        "method": "heun",
+        "steps": 13
+      },
+      {
+        "name": "ab2_5",
+        "method": "ab2",
+        "steps": 5
+      },
+      {
+        "name": "ab2_10",
+        "method": "ab2",
+        "steps": 10
+      },
+      {
+        "name": "ab2_15",
+        "method": "ab2",
+        "steps": 15
+      }
+    ],
+    "budget_mapping": [
+      {
+        "method": "euler",
+        "nominal_pass_budget": 10,
+        "configuration": "euler_5",
+        "realized_passes": 10
+      },
+      {
+        "method": "euler",
+        "nominal_pass_budget": 20,
+        "configuration": "euler_10",
+        "realized_passes": 20
+      },
+      {
+        "method": "euler",
+        "nominal_pass_budget": 30,
+        "configuration": "euler_15",
+        "realized_passes": 30
+      },
+      {
+        "method": "euler",
+        "nominal_pass_budget": 50,
+        "configuration": "euler_25",
+        "realized_passes": 50
+      },
+      {
+        "method": "euler",
+        "nominal_pass_budget": 100,
+        "configuration": "euler_50",
+        "realized_passes": 100
+      },
+      {
+        "method": "heun",
+        "nominal_pass_budget": 10,
+        "configuration": "heun_3",
+        "realized_passes": 10
+      },
+      {
+        "method": "heun",
+        "nominal_pass_budget": 20,
+        "configuration": "heun_5",
+        "realized_passes": 18
+      },
+      {
+        "method": "heun",
+        "nominal_pass_budget": 30,
+        "configuration": "heun_8",
+        "realized_passes": 30
+      },
+      {
+        "method": "heun",
+        "nominal_pass_budget": 50,
+        "configuration": "heun_13",
+        "realized_passes": 50
+      },
+      {
+        "method": "heun",
+        "nominal_pass_budget": 100,
+        "configuration": "heun_25",
+        "realized_passes": 98
+      },
+      {
+        "method": "ab2",
+        "nominal_pass_budget": 10,
+        "configuration": "ab2_5",
+        "realized_passes": 10
+      },
+      {
+        "method": "ab2",
+        "nominal_pass_budget": 20,
+        "configuration": "ab2_10",
+        "realized_passes": 20
+      },
+      {
+        "method": "ab2",
+        "nominal_pass_budget": 30,
+        "configuration": "ab2_15",
+        "realized_passes": 30
+      },
+      {
+        "method": "ab2",
+        "nominal_pass_budget": 50,
+        "configuration": "ab2_25",
+        "realized_passes": 50
+      },
+      {
+        "method": "ab2",
+        "nominal_pass_budget": 100,
+        "configuration": "ab2_50",
+        "realized_passes": 100
+      }
+    ]
+  },
+  "upstream": {
+    "repository": "https://github.com/LTH14/JiT",
+    "revision": "cbc743a2ada5e9762697da2c83f8c4f8379e8c17",
+    "files": {
+      "denoiser.py": "3649319428f758080828b164266284a75dcd73b53ce81827302be0824bca91a4",
+      "model_jit.py": "0293a23c01312317701c96704b85e7fe00b15d9261aa845731ea434103fd7563",
+      "util/model_util.py": "f4f35cc86a41b374d9e3654c8a2cddc12fbb11d41a28d24f05cf667c008b912e",
+      "main_jit.py": "00bf2423d4b28a66748a1d7695b392687e7fe32c032d61c47710f010740ce6c2",
+      "engine_jit.py": "f3ef5b5df80734a4033da7e613325f7be5ef187c582dba1ea59d169ce1fbb3ce",
+      "README.md": "1015d58695f22f3a3096549484413de87b76e9b9ae30e913fb15a34ccfcc12ef",
+      "LICENSE": "27658d5a15c520f7029fd1218696517e8d6b362c10d11c7e2a8e1977a0d7beb8",
+      "fid_stats/jit_in256_stats.npz": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c"
+    }
+  },
+  "checkpoint": "/mnt/research/jit-sampling/checkpoints/jit-b-16.pth",
+  "checkpoint_sha256": "4ebcf24698748548d13bef1b4c3b26c72c6ec2bc633002b3f558697920cb2695",
+  "torch": "2.14.1+cu130",
+  "cuda": "13.0",
+  "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "gpu_capability": [
+    12,
+    0
+  ],
+  "timing_boundary": "Sampler with initial noise/labels already on GPU; includes network and solver; excludes RNG, transfers, loading, metrics and saving",
+  "compile": false,
+  "tf32": false,
+  "lpips_requested": false,
+  "resolved_configurations": [
+    {
+      "name": "heun_50",
+      "method": "heun",
+      "steps": 50,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_5",
+      "method": "euler",
+      "steps": 5,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_10",
+      "method": "euler",
+      "steps": 10,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_15",
+      "method": "euler",
+      "steps": 15,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_25",
+      "method": "euler",
+      "steps": 25,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "euler_50",
+      "method": "euler",
+      "steps": 50,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "heun_3",
+      "method": "heun",
+      "steps": 3,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "heun_5",
+      "method": "heun",
+      "steps": 5,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "heun_8",
+      "method": "heun",
+      "steps": 8,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "heun_13",
+      "method": "heun",
+      "steps": 13,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "heun_25",
+      "method": "heun",
+      "steps": 25,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_5",
+      "method": "ab2",
+      "steps": 5,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_10",
+      "method": "ab2",
+      "steps": 10,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_15",
+      "method": "ab2",
+      "steps": 15,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_25",
+      "method": "ab2",
+      "steps": 25,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_50",
+      "method": "ab2",
+      "steps": 50,
+      "schedule_power": 1.0
+    }
+  ],
+  "config_sha256": "99063e0afe093c94210a58f4e35ccd2b66646ff809a42ac918f45e64ea26143d",
+  "git_revision": "0cd0b9176b751ca9fd560a715718c4eeca223554",
+  "git_diff": "diff --git a/src/jit_pilot/run.py b/src/jit_pilot/run.py\nindex a24d6c9..80d8e9c 100644\n--- a/src/jit_pilot/run.py\n+++ b/src/jit_pilot/run.py\n@@ -1,6 +1,7 @@\n \"\"\"Single-GPU paired sampling and timing. No training and no fake benchmark mode.\"\"\"\n import argparse\n from contextlib import nullcontext\n+from dataclasses import asdict\n import csv\n from datetime import datetime, timezone\n import json\n@@ -13,7 +14,7 @@ import time\n import numpy as np\n from PIL import Image, ImageDraw\n import torch\n-from .samplers import CONFIGS, expected_network_passes, sample\n+from .samplers import CONFIGS, Configuration, expected_network_passes, sample\n from .upstream import ROOT, load_model, sha256, verify_source\n \n def write_json(path, data):\n@@ -90,6 +91,11 @@ def main():\n     if count<batch or batch<1 or settings['warmup']<1 or settings['repeats']<3:\n         parser.error('Require samples >= batch >= 1, warmup >= 1, repeats >= 3')\n     lookup={c.name:c for c in CONFIGS}\n+    for item in settings.get('additional_configurations', []):\n+        config=Configuration(**item)\n+        if config.name in lookup or not config.name or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_.' for c in config.name):\n+            parser.error('Additional configuration names must be unique safe path components')\n+        lookup[config.name]=config\n     configs=[lookup[name] for name in settings['configurations']]\n     if len({c.name for c in configs})!=len(configs) or 'heun_50' not in settings['configurations']:\n         parser.error('Configurations must be distinct and include heun_50 reference')\n@@ -111,7 +117,12 @@ def main():\n         'torch':torch.__version__,'cuda':torch.version.cuda,'platform':platform.platform(),\n         'gpu':torch.cuda.get_device_name(0),'gpu_capability':torch.cuda.get_device_capability(0),\n         'timing_boundary':'Sampler with initial noise/labels already on GPU; includes network and solver; excludes RNG, transfers, loading, metrics and saving',\n-        'compile':False,'tf32':False,'lpips_requested':args.lpips}\n+        'compile':False,'tf32':False,'lpips_requested':args.lpips,\n+        'resolved_configurations':[asdict(c) for c in configs],\n+        'config_sha256':sha256(args.config),\n+        'git_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),\n+        'git_diff':subprocess.check_output(['git','diff'],cwd=ROOT,text=True),\n+        'packages':subprocess.check_output([__import__('sys').executable,'-m','pip','freeze'],text=True).splitlines()}\n     try:\n         metadata['nvidia_smi']=subprocess.check_output(['nvidia-smi','--query-gpu=name,driver_version,memory.total','--format=csv,noheader'],text=True).strip()\n     except (FileNotFoundError,subprocess.CalledProcessError):\n@@ -177,6 +188,8 @@ def main():\n             for i,image in zip(ids,images):\n                 Image.fromarray(image).save(folder/f'{i:06d}.png')\n             del z,y,images\n+            if (start+batch) % 100 == 0:\n+                print(f'{config.name}: saved {min(start+batch,count)}/{count}',flush=True)\n         print(f'Saved {count} images: {config.name}',flush=True)\n     agreement={r['configuration']:r for r in paired_metrics(output,configs,count,args.lpips)}\n     reference=statistics.median(timings['heun_50'])\n@@ -184,6 +197,8 @@ def main():\n     for config in configs:\n         ms=timings[config.name]\n         rows.append({'configuration':config.name,'steps':config.steps,\n+            'schedule_power':config.schedule_power,\n+            'actual_forward_calls_per_batch':passes[config.name],\n             'network_passes_per_image':passes[config.name],\n             'guided_velocity_evaluations':passes[config.name]//2,\n             'batch_size':batch,'median_batch_ms':statistics.median(ms),\ndiff --git a/src/jit_pilot/samplers.py b/src/jit_pilot/samplers.py\nindex f6ab417..7d907b6 100644\n--- a/src/jit_pilot/samplers.py\n+++ b/src/jit_pilot/samplers.py\n@@ -1,5 +1,6 @@\n \"\"\"Keep official Euler/Heun step functions unchanged; add only an AB2 loop.\"\"\"\n from dataclasses import dataclass\n+import math\n import torch\n \n @dataclass(frozen=True)\n@@ -7,6 +8,13 @@ class Configuration:\n     name: str\n     method: str\n     steps: int\n+    schedule_power: float = 1.0\n+\n+    def __post_init__(self):\n+        if self.method not in {'euler', 'heun', 'ab2'} or self.steps < 1:\n+            raise ValueError('Invalid solver or step count')\n+        if not math.isfinite(self.schedule_power) or self.schedule_power <= 0:\n+            raise ValueError('Schedule power must be finite and positive')\n \n CONFIGS = tuple(Configuration(f\"{method}_{steps}\", method, steps)\n                 for method, steps in [(\"heun\",50),(\"heun\",25),(\"euler\",50),\n@@ -29,6 +37,11 @@ def sample(model, noise, labels, config):\n     # Same uniform grid, state dtype and endpoint convention as Denoiser.generate.\n     z = noise.clone()\n     times = torch.linspace(0., 1., config.steps + 1, device=z.device)\n+    # Explicit addition for schedule ablations. The uniform reference is untouched.\n+    if config.schedule_power != 1.0:\n+        times = times.pow(config.schedule_power)\n+    if not torch.all(times[1:] > times[:-1]):\n+        raise ValueError('Timesteps must be strictly increasing')\n     times = times.view(-1, *([1] * z.ndim)).expand(-1, len(labels), -1, -1, -1)\n     previous = previous_step = None\n     for i in range(config.steps):\ndiff --git a/tests/test_samplers.py b/tests/test_samplers.py\nindex 2f6457d..e52f698 100644\n--- a/tests/test_samplers.py\n+++ b/tests/test_samplers.py\n@@ -82,4 +82,22 @@ class OfficialParityTests(unittest.TestCase):\n             self.assertTrue(torch.isfinite(result).all())\n             torch.testing.assert_close(z,copy,rtol=0,atol=0)\n \n+    def test_nonuniform_grids_integrate_linear_time_velocity(self):\n+        model=self.fake_model()\n+        model._forward_sample=lambda z,t,y: (2*t+3).expand_as(z)\n+        labels=torch.tensor([3,93]);z=torch.zeros(2,3,4,4)\n+        for power in [.5,2.]:\n+            grid=torch.linspace(0.,1.,26).pow(power)\n+            for method in ['euler','heun','ab2']:\n+                actual=sample(model,z,labels,Configuration('test',method,25,power))\n+                h=grid[1:]-grid[:-1]\n+                if method=='euler': expected=float(((2*grid[:-1]+3)*h).sum())\n+                elif method=='heun': expected=4-float(h[-1]**2)\n+                else: expected=4-float(h[0]**2)\n+                torch.testing.assert_close(actual,torch.full_like(z,expected),rtol=1e-5,atol=1e-5)\n+\n+    def test_invalid_schedules_are_rejected(self):\n+        for power in [0,-1,float('nan'),float('inf')]:\n+            with self.assertRaises(ValueError):Configuration('bad','ab2',25,power)\n+\n if __name__=='__main__':unittest.main()\n",
+  "packages": [
+    "cuda-bindings==13.4.4",
+    "cuda-pathfinder==1.8.4",
+    "cuda-toolkit==13.0.3.0",
+    "einops==0.8.2",
+    "filelock==4.2.4",
+    "fsspec==2026.9.0",
+    "Jinja2==3.1.6",
+    "-e git+https://github.com/Zajason/Jit-Sampling-Efficiency@0cd0b9176b751ca9fd560a715718c4eeca223554#egg=jit_sampling_efficiency",
+    "lpips==0.1.4",
+    "MarkupSafe==3.0.3",
+    "mpmath==1.3.0",
+    "networkx==3.7",
+    "numpy==2.5.4",
+    "nvidia-cublas==13.1.1.3",
+    "nvidia-cuda-cupti==13.0.85",
+    "nvidia-cuda-nvrtc==13.0.88",
+    "nvidia-cuda-runtime==13.0.96",
+    "nvidia-cudnn-cu13==9.24.0.43",
+    "nvidia-cufft==12.0.0.61",
+    "nvidia-cufile==1.15.1.6",
+    "nvidia-curand==10.4.0.35",
+    "nvidia-cusolver==12.0.4.66",
+    "nvidia-cusparse==12.6.3.3",
+    "nvidia-cusparselt-cu13==0.8.1",
+    "nvidia-nccl-cu13==2.30.7",
+    "nvidia-nvjitlink==13.4.92",
+    "nvidia-nvshmem-cu13==3.4.5",
+    "nvidia-nvtx==13.0.85",
+    "pillow==13.0.0",
+    "scipy==1.18.1",
+    "setuptools==78.1.0",
+    "sympy==1.14.0",
+    "torch==2.14.1+cu130",
+    "torch_fidelity @ git+https://github.com/LTH14/torch-fidelity.git@bfe72b995473e4fee9351705d7b005f17442a4ca",
+    "torchvision==0.29.1+cu130",
+    "tqdm==4.70.1",
+    "triton==3.8.0",
+    "typing_extensions==4.16.0"
+  ],
+  "nvidia_smi": "NVIDIA GeForce RTX 5080, 580.178.04, 16303 MiB"
+}

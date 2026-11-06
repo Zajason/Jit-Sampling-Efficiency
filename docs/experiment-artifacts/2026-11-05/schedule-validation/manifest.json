@@ -1,0 +1,140 @@
+{
+  "status": "complete",
+  "settings": {
+    "description": "Validation only: fixed solver and 50-pass budget; t=u^p with p=0.5,1,2.",
+    "samples": 2000,
+    "batch_size": 4,
+    "seed": 20271106,
+    "warmup": 2,
+    "repeats": 7,
+    "precision": "bf16",
+    "cfg": 3.0,
+    "configurations": [
+      "heun_50",
+      "ab2_25",
+      "ab2_25_p0_5",
+      "ab2_25_p2_0"
+    ],
+    "additional_configurations": [
+      {
+        "name": "ab2_25_p0_5",
+        "method": "ab2",
+        "steps": 25,
+        "schedule_power": 0.5
+      },
+      {
+        "name": "ab2_25_p2_0",
+        "method": "ab2",
+        "steps": 25,
+        "schedule_power": 2.0
+      }
+    ]
+  },
+  "upstream": {
+    "repository": "https://github.com/LTH14/JiT",
+    "revision": "cbc743a2ada5e9762697da2c83f8c4f8379e8c17",
+    "files": {
+      "denoiser.py": "3649319428f758080828b164266284a75dcd73b53ce81827302be0824bca91a4",
+      "model_jit.py": "0293a23c01312317701c96704b85e7fe00b15d9261aa845731ea434103fd7563",
+      "util/model_util.py": "f4f35cc86a41b374d9e3654c8a2cddc12fbb11d41a28d24f05cf667c008b912e",
+      "main_jit.py": "00bf2423d4b28a66748a1d7695b392687e7fe32c032d61c47710f010740ce6c2",
+      "engine_jit.py": "f3ef5b5df80734a4033da7e613325f7be5ef187c582dba1ea59d169ce1fbb3ce",
+      "README.md": "1015d58695f22f3a3096549484413de87b76e9b9ae30e913fb15a34ccfcc12ef",
+      "LICENSE": "27658d5a15c520f7029fd1218696517e8d6b362c10d11c7e2a8e1977a0d7beb8",
+      "fid_stats/jit_in256_stats.npz": "412046720c0d496dc6d72a30eac3e22b9ef6ddac3501cce7f996674ad227ba4c"
+    }
+  },
+  "checkpoint": "/mnt/research/jit-sampling/checkpoints/jit-b-16.pth",
+  "checkpoint_sha256": "4ebcf24698748548d13bef1b4c3b26c72c6ec2bc633002b3f558697920cb2695",
+  "torch": "2.14.1+cu130",
+  "cuda": "13.0",
+  "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+  "gpu": "NVIDIA GeForce RTX 5080",
+  "gpu_capability": [
+    12,
+    0
+  ],
+  "timing_boundary": "Sampler with initial noise/labels already on GPU; includes network and solver; excludes RNG, transfers, loading, metrics and saving",
+  "compile": false,
+  "tf32": false,
+  "lpips_requested": false,
+  "resolved_configurations": [
+    {
+      "name": "heun_50",
+      "method": "heun",
+      "steps": 50,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_25",
+      "method": "ab2",
+      "steps": 25,
+      "schedule_power": 1.0
+    },
+    {
+      "name": "ab2_25_p0_5",
+      "method": "ab2",
+      "steps": 25,
+      "schedule_power": 0.5
+    },
+    {
+      "name": "ab2_25_p2_0",
+      "method": "ab2",
+      "steps": 25,
+      "schedule_power": 2.0
+    }
+  ],
+  "config_sha256": "e98063afcad96414b13bce78ac16eac030f10f4def00cedc24dc1fab4ade5bc2",
+  "git_revision": "0cd0b9176b751ca9fd560a715718c4eeca223554",
+  "git_diff": "diff --git a/.gitignore b/.gitignore\nindex aeeff4a..c9f4d7f 100644\n--- a/.gitignore\n+++ b/.gitignore\n@@ -1,9 +1,12 @@\n .venv/\n+.venv\n __pycache__/\n *.egg-info/\n .pytest_cache/\n .DS_Store\n vendor/\n checkpoints/\n+checkpoints\n results/\n+results\n !results/.gitkeep\ndiff --git a/README.md b/README.md\nindex 90d6b68..5b786e7 100644\n--- a/README.md\n+++ b/README.md\n@@ -16,7 +16,7 @@ This project tests whether existing numerical sampling methods can generate JiT\n \n The pretrained network, guidance calculation, and Euler/Heun step functions come directly from the author-maintained [LTH14/JiT](https://github.com/LTH14/JiT) repository. A minimal upstream snapshot is pinned by commit and file hashes in `configs/upstream.json`; upstream files are never edited. This is the authors' PyTorch/GPU reimplementation; their original paper implementation used JAX/TPU.\n \n-Only the sampling loop for Adams\u2013Bashforth 2 (AB2) is new. It starts with Euler and then reuses the previous velocity. All six configurations use uniform timesteps, first-EMA checkpoint weights, CFG 3.0 with interval (0.1, 1.0), and the upstream denominator clamp `t_eps=0.05`. Guidance is not optimized away outside its active interval, matching upstream compute behavior. The guidance switch and denominator clamp can make the dynamics nonsmooth; higher numerical order is therefore not a guarantee of better images.\n+The sampling loop for Adams\u2013Bashforth 2 (AB2) is an explicitly identified addition. It starts with Euler and then reuses the previous velocity. All six original pilot configurations use uniform timesteps, first-EMA checkpoint weights, CFG 3.0 with interval (0.1, 1.0), and the upstream denominator clamp `t_eps=0.05`. The full proposal study below adds separately identified fixed nonuniform-grid ablations. Guidance is not optimized away outside its active interval, matching upstream compute behavior. The guidance switch and denominator clamp can make the dynamics nonsmooth; higher numerical order is therefore not a guarantee of better images.\n \n | Configuration | Steps | Guided velocity evaluations | Network passes/image |\n |---|---:|---:|---:|\n@@ -107,6 +107,41 @@ The optional FID installer uses the pinned author-maintained `LTH14/torch-fideli\n \n If only fewer-step Euler/Heun works, the project still yields a useful quality\u2013latency comparison. If AB2 fails, report that rather than tuning on final test seeds. Nonuniform schedule experiments come after this baseline pilot.\n \n+## Full proposal study\n+\n+`configs/solver-budgets.json` extends the original uniform pilot to nominal\n+10, 20, 30, 50 and 100 sample-equivalent network passes per image. Heun uses\n+the nearest feasible count at or below the budget; the exact mapping is saved\n+in the config. The official Heun-50 reference remains a separate 198-pass point.\n+Additional configurations explicitly record their method, steps and schedule\n+power. Nonuniform schedules use `t = u ** power` and the same official step\n+functions; they are identified ablations, not official sampler parity claims.\n+\n+The sequential study runner performs the 2,000-image uniform screen, then\n+validation-only schedule selection with a fixed solver, and freezes finalists\n+before two independent 5,000-image evaluations. Read\n+[the execution protocol](docs/experiment-protocol.md) for the predeclared\n+selection rules, seeds, timing boundary and sample-size limitations.\n+\n+```bash\n+python scripts/run_study.py \\\n+  --checkpoint checkpoints/jit-b-16.pth \\\n+  --output results/study-NEW\n+python scripts/export_study.py \\\n+  --study results/study-NEW --pilot results/pilot-NEW \\\n+  --output results/presentation-NEW\n+python scripts/capture_intermediates.py \\\n+  --study results/study-NEW --checkpoint checkpoints/jit-b-16.pth \\\n+  --output results/intermediates-NEW\n+```\n+\n+Run the original LPIPS-enabled pilot first and inspect its paired grid.\n+The exporter additionally requires `matplotlib`; it creates PNG, SVG and PDF\n+figures, a consolidated CSV and presentation notes. Intermediate conditional\n+predictions are captured separately, outside all sampler timing.\n+Every output directory must be new. `status.json`, stage logs, per-stage\n+manifests and `selection.json` make progress and selection inspectable.\n+\n ## Structure\n \n ```text\n@@ -120,4 +155,7 @@ checkpoints/             Downloaded pretrained checkpoint; ignored by Git\n results/                 Actual experiment outputs; ignored by Git\n ```\n \n-No pretrained-image benchmarks have been run during project setup. See `docs/validation.md` for the tests performed and execution requirements.\n+The original project setup used analytic tests only. A pretrained 64-image\n+pilot was completed on the RTX 5080 on 5 November 2026; see\n+`docs/validation.md` for the distinction between those results and the setup\n+tests. Larger study results must be read from their completed run manifests.\ndiff --git a/docs/validation.md b/docs/validation.md\nindex 571f57c..c1f954e 100644\n--- a/docs/validation.md\n+++ b/docs/validation.md\n@@ -21,10 +21,36 @@ Validated on 5 November 2026 on the local Mac, using an isolated Python 3.11 env\n - Optional official FID fork: `bfe72b995473e4fee9351705d7b005f17442a4ca` from `https://github.com/LTH14/torch-fidelity`.\n - Test dependencies: torch 2.15.0, numpy 2.4.6, Pillow 13.0.0, einops 0.8.2. GPU execution records its own actual environment in each run manifest; the Mac test environment is not a CUDA installation recipe.\n \n-## Not yet run\n+## Status at original setup (historical)\n \n No pretrained checkpoint was downloaded or executed, and no image-generation benchmark, LPIPS calculation, or FID screen was run. The tests above establish code correctness on controlled inputs, not image quality or speedup. CUDA generation, checkpoint compatibility with the downloaded public artifact, GPU memory fit, and measured performance still require the RTX 5080 and the official checkpoint.\n \n+## CUDA execution \u2014 5 November 2026\n+\n+An isolated environment at `/mnt/research/jit-sampling-venv` uses Python 3.14.4,\n+PyTorch 2.14.1+cu130, torchvision 0.29.1+cu130 and the RTX 5080 (capability 12.0).\n+CUDA tensor execution and bf16 support were checked. `pip check` passes.\n+The pinned official snapshot and FID statistics passed all SHA-256 checks.\n+The official JiT-B/16 checkpoint was downloaded through the pinned upstream\n+README's public Dropbox folder; its exact digest is in each run manifest.\n+The pinned FID fork and LPIPS feature weights are installed.\n+\n+All 10 unit tests pass, including the existing exact uniform Euler/Heun parity\n+tests and added nonuniform-grid integration/invalid-schedule checks. These\n+remain analytic tests, distinct from the pretrained execution below.\n+\n+The original 64-pair pretrained pilot completed at\n+`/mnt/research/jit-sampling/results/pilot-20261105-001`: 384 PNGs,\n+seven randomized timing rounds after two warm-ups, paired pixel RMSE and LPIPS.\n+Heun-50 median sampler time was 1091.41 ms/batch of four; AB2-25 was\n+275.11 ms/batch (3.967x measured speedup). These are amortized batch timings,\n+not batch-1 latency. The pilot has no FID and does not establish the 10%\n+quality target. Timing boundaries and complete provenance are in its manifest.\n+\n+The larger study is tracked separately in\n+`/mnt/research/jit-sampling/results/study-20261105-001/status.json`.\n+Do not infer completion or quality results from this validation note.\n+\n ## Project registration\n \n The local project folder and Git repository were created. Adding the folder to the Codex sidebar requires the user's project picker: no project-creation connector is available, and computer use explicitly prohibits operating the Codex app itself. No application database or internal configuration was modified as a workaround.\ndiff --git a/pyproject.toml b/pyproject.toml\nindex 711f2cd..373d180 100644\n--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -12,6 +12,7 @@ dependencies = [\"torch>=2.7\", \"numpy>=1.26\", \"Pillow>=10\", \"einops>=0.8\"]\n [project.optional-dependencies]\n perceptual = [\"lpips>=0.1.4\", \"torchvision>=0.22\"]\n proposal = [\"reportlab>=4\"]\n+analysis = [\"matplotlib>=3.10\"]\n \n [project.scripts]\n jit-pilot = \"jit_pilot.run:main\"\ndiff --git a/src/jit_pilot/run.py b/src/jit_pilot/run.py\nindex a24d6c9..80d8e9c 100644\n--- a/src/jit_pilot/run.py\n+++ b/src/jit_pilot/run.py\n@@ -1,6 +1,7 @@\n \"\"\"Single-GPU paired sampling and timing. No training and no fake benchmark mode.\"\"\"\n import argparse\n from contextlib import nullcontext\n+from dataclasses import asdict\n import csv\n from datetime import datetime, timezone\n import json\n@@ -13,7 +14,7 @@ import time\n import numpy as np\n from PIL import Image, ImageDraw\n import torch\n-from .samplers import CONFIGS, expected_network_passes, sample\n+from .samplers import CONFIGS, Configuration, expected_network_passes, sample\n from .upstream import ROOT, load_model, sha256, verify_source\n \n def write_json(path, data):\n@@ -90,6 +91,11 @@ def main():\n     if count<batch or batch<1 or settings['warmup']<1 or settings['repeats']<3:\n         parser.error('Require samples >= batch >= 1, warmup >= 1, repeats >= 3')\n     lookup={c.name:c for c in CONFIGS}\n+    for item in settings.get('additional_configurations', []):\n+        config=Configuration(**item)\n+        if config.name in lookup or not config.name or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_.' for c in config.name):\n+            parser.error('Additional configuration names must be unique safe path components')\n+        lookup[config.name]=config\n     configs=[lookup[name] for name in settings['configurations']]\n     if len({c.name for c in configs})!=len(configs) or 'heun_50' not in settings['configurations']:\n         parser.error('Configurations must be distinct and include heun_50 reference')\n@@ -111,7 +117,12 @@ def main():\n         'torch':torch.__version__,'cuda':torch.version.cuda,'platform':platform.platform(),\n         'gpu':torch.cuda.get_device_name(0),'gpu_capability':torch.cuda.get_device_capability(0),\n         'timing_boundary':'Sampler with initial noise/labels already on GPU; includes network and solver; excludes RNG, transfers, loading, metrics and saving',\n-        'compile':False,'tf32':False,'lpips_requested':args.lpips}\n+        'compile':False,'tf32':False,'lpips_requested':args.lpips,\n+        'resolved_configurations':[asdict(c) for c in configs],\n+        'config_sha256':sha256(args.config),\n+        'git_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),\n+        'git_diff':subprocess.check_output(['git','diff'],cwd=ROOT,text=True),\n+        'packages':subprocess.check_output([__import__('sys').executable,'-m','pip','freeze'],text=True).splitlines()}\n     try:\n         metadata['nvidia_smi']=subprocess.check_output(['nvidia-smi','--query-gpu=name,driver_version,memory.total','--format=csv,noheader'],text=True).strip()\n     except (FileNotFoundError,subprocess.CalledProcessError):\n@@ -177,6 +188,8 @@ def main():\n             for i,image in zip(ids,images):\n                 Image.fromarray(image).save(folder/f'{i:06d}.png')\n             del z,y,images\n+            if (start+batch) % 100 == 0:\n+                print(f'{config.name}: saved {min(start+batch,count)}/{count}',flush=True)\n         print(f'Saved {count} images: {config.name}',flush=True)\n     agreement={r['configuration']:r for r in paired_metrics(output,configs,count,args.lpips)}\n     reference=statistics.median(timings['heun_50'])\n@@ -184,6 +197,8 @@ def main():\n     for config in configs:\n         ms=timings[config.name]\n         rows.append({'configuration':config.name,'steps':config.steps,\n+            'schedule_power':config.schedule_power,\n+            'actual_forward_calls_per_batch':passes[config.name],\n             'network_passes_per_image':passes[config.name],\n             'guided_velocity_evaluations':passes[config.name]//2,\n             'batch_size':batch,'median_batch_ms':statistics.median(ms),\ndiff --git a/src/jit_pilot/samplers.py b/src/jit_pilot/samplers.py\nindex f6ab417..7d907b6 100644\n--- a/src/jit_pilot/samplers.py\n+++ b/src/jit_pilot/samplers.py\n@@ -1,5 +1,6 @@\n \"\"\"Keep official Euler/Heun step functions unchanged; add only an AB2 loop.\"\"\"\n from dataclasses import dataclass\n+import math\n import torch\n \n @dataclass(frozen=True)\n@@ -7,6 +8,13 @@ class Configuration:\n     name: str\n     method: str\n     steps: int\n+    schedule_power: float = 1.0\n+\n+    def __post_init__(self):\n+        if self.method not in {'euler', 'heun', 'ab2'} or self.steps < 1:\n+            raise ValueError('Invalid solver or step count')\n+        if not math.isfinite(self.schedule_power) or self.schedule_power <= 0:\n+            raise ValueError('Schedule power must be finite and positive')\n \n CONFIGS = tuple(Configuration(f\"{method}_{steps}\", method, steps)\n                 for method, steps in [(\"heun\",50),(\"heun\",25),(\"euler\",50),\n@@ -29,6 +37,11 @@ def sample(model, noise, labels, config):\n     # Same uniform grid, state dtype and endpoint convention as Denoiser.generate.\n     z = noise.clone()\n     times = torch.linspace(0., 1., config.steps + 1, device=z.device)\n+    # Explicit addition for schedule ablations. The uniform reference is untouched.\n+    if config.schedule_power != 1.0:\n+        times = times.pow(config.schedule_power)\n+    if not torch.all(times[1:] > times[:-1]):\n+        raise ValueError('Timesteps must be strictly increasing')\n     times = times.view(-1, *([1] * z.ndim)).expand(-1, len(labels), -1, -1, -1)\n     previous = previous_step = None\n     for i in range(config.steps):\ndiff --git a/tests/test_samplers.py b/tests/test_samplers.py\nindex 2f6457d..e52f698 100644\n--- a/tests/test_samplers.py\n+++ b/tests/test_samplers.py\n@@ -82,4 +82,22 @@ class OfficialParityTests(unittest.TestCase):\n             self.assertTrue(torch.isfinite(result).all())\n             torch.testing.assert_close(z,copy,rtol=0,atol=0)\n \n+    def test_nonuniform_grids_integrate_linear_time_velocity(self):\n+        model=self.fake_model()\n+        model._forward_sample=lambda z,t,y: (2*t+3).expand_as(z)\n+        labels=torch.tensor([3,93]);z=torch.zeros(2,3,4,4)\n+        for power in [.5,2.]:\n+            grid=torch.linspace(0.,1.,26).pow(power)\n+            for method in ['euler','heun','ab2']:\n+                actual=sample(model,z,labels,Configuration('test',method,25,power))\n+                h=grid[1:]-grid[:-1]\n+                if method=='euler': expected=float(((2*grid[:-1]+3)*h).sum())\n+                elif method=='heun': expected=4-float(h[-1]**2)\n+                else: expected=4-float(h[0]**2)\n+                torch.testing.assert_close(actual,torch.full_like(z,expected),rtol=1e-5,atol=1e-5)\n+\n+    def test_invalid_schedules_are_rejected(self):\n+        for power in [0,-1,float('nan'),float('inf')]:\n+            with self.assertRaises(ValueError):Configuration('bad','ab2',25,power)\n+\n if __name__=='__main__':unittest.main()\n",
+  "packages": [
+    "contourpy==1.4.0",
+    "cuda-bindings==13.4.4",
+    "cuda-pathfinder==1.8.4",
+    "cuda-toolkit==13.0.3.0",
+    "cycler==0.12.1",
+    "einops==0.8.2",
+    "filelock==4.2.4",
+    "fonttools==4.68.0",
+    "fsspec==2026.9.0",
+    "Jinja2==3.1.6",
+    "-e git+https://github.com/Zajason/Jit-Sampling-Efficiency@0cd0b9176b751ca9fd560a715718c4eeca223554#egg=jit_sampling_efficiency",
+    "kiwisolver==1.5.1",
+    "lpips==0.1.4",
+    "MarkupSafe==3.0.3",
+    "matplotlib==3.11.2",
+    "mpmath==1.3.0",
+    "networkx==3.7",
+    "numpy==2.5.4",
+    "nvidia-cublas==13.1.1.3",
+    "nvidia-cuda-cupti==13.0.85",
+    "nvidia-cuda-nvrtc==13.0.88",
+    "nvidia-cuda-runtime==13.0.96",
+    "nvidia-cudnn-cu13==9.24.0.43",
+    "nvidia-cufft==12.0.0.61",
+    "nvidia-cufile==1.15.1.6",
+    "nvidia-curand==10.4.0.35",
+    "nvidia-cusolver==12.0.4.66",
+    "nvidia-cusparse==12.6.3.3",
+    "nvidia-cusparselt-cu13==0.8.1",
+    "nvidia-nccl-cu13==2.30.7",
+    "nvidia-nvjitlink==13.4.92",
+    "nvidia-nvshmem-cu13==3.4.5",
+    "nvidia-nvtx==13.0.85",
+    "packaging==26.3",
+    "pillow==13.0.0",
+    "pyparsing==3.3.3",
+    "python-dateutil==4.0.0",
+    "scipy==1.18.1",
+    "setuptools==78.1.0",
+    "sympy==1.14.0",
+    "torch==2.14.1+cu130",
+    "torch_fidelity @ git+https://github.com/LTH14/torch-fidelity.git@bfe72b995473e4fee9351705d7b005f17442a4ca",
+    "torchvision==0.29.1+cu130",
+    "tqdm==4.70.1",
+    "triton==3.8.0",
+    "typing_extensions==4.16.0",
+    "tzdata==2026.6"
+  ],
+  "nvidia_smi": "NVIDIA GeForce RTX 5080, 580.178.04, 16303 MiB"
+}

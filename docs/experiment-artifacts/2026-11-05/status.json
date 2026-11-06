@@ -1,0 +1,9 @@
+{
+  "status": "awaiting_cuda_recovery",
+  "started": "2026-11-05T20:04:20.052702+00:00",
+  "completed": [
+    "uniform-screen",
+    "schedule-validation"
+  ],
+  "stage": "final-evaluation-pending"
+}

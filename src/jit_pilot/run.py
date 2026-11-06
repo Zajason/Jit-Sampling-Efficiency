@@ -1,6 +1,7 @@
 """Single-GPU paired sampling and timing. No training and no fake benchmark mode."""
 import argparse
 from contextlib import nullcontext
+from dataclasses import asdict
 import csv
 from datetime import datetime, timezone
 import json
@@ -13,7 +14,7 @@ import time
 import numpy as np
 from PIL import Image, ImageDraw
 import torch
-from .samplers import CONFIGS, expected_network_passes, sample
+from .samplers import CONFIGS, Configuration, expected_network_passes, sample
 from .upstream import ROOT, load_model, sha256, verify_source
 
 def write_json(path, data):
@@ -90,6 +91,11 @@ def main():
     if count<batch or batch<1 or settings['warmup']<1 or settings['repeats']<3:
         parser.error('Require samples >= batch >= 1, warmup >= 1, repeats >= 3')
     lookup={c.name:c for c in CONFIGS}
+    for item in settings.get('additional_configurations', []):
+        config=Configuration(**item)
+        if config.name in lookup or not config.name or config.name in {'.','..'} or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789_.' for c in config.name):
+            parser.error('Additional configuration names must be unique safe path components')
+        lookup[config.name]=config
     configs=[lookup[name] for name in settings['configurations']]
     if len({c.name for c in configs})!=len(configs) or 'heun_50' not in settings['configurations']:
         parser.error('Configurations must be distinct and include heun_50 reference')
@@ -111,7 +117,12 @@ def main():
         'torch':torch.__version__,'cuda':torch.version.cuda,'platform':platform.platform(),
         'gpu':torch.cuda.get_device_name(0),'gpu_capability':torch.cuda.get_device_capability(0),
         'timing_boundary':'Sampler with initial noise/labels already on GPU; includes network and solver; excludes RNG, transfers, loading, metrics and saving',
-        'compile':False,'tf32':False,'lpips_requested':args.lpips}
+        'compile':False,'tf32':False,'lpips_requested':args.lpips,
+        'resolved_configurations':[asdict(c) for c in configs],
+        'config_sha256':sha256(args.config),
+        'git_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        'git_diff':subprocess.check_output(['git','diff'],cwd=ROOT,text=True),
+        'packages':subprocess.check_output([__import__('sys').executable,'-m','pip','freeze'],text=True).splitlines()}
     try:
         metadata['nvidia_smi']=subprocess.check_output(['nvidia-smi','--query-gpu=name,driver_version,memory.total','--format=csv,noheader'],text=True).strip()
     except (FileNotFoundError,subprocess.CalledProcessError):
@@ -177,6 +188,8 @@ def main():
             for i,image in zip(ids,images):
                 Image.fromarray(image).save(folder/f'{i:06d}.png')
             del z,y,images
+            if (start+batch) % 100 == 0:
+                print(f'{config.name}: saved {min(start+batch,count)}/{count}',flush=True)
         print(f'Saved {count} images: {config.name}',flush=True)
     agreement={r['configuration']:r for r in paired_metrics(output,configs,count,args.lpips)}
     reference=statistics.median(timings['heun_50'])
@@ -184,6 +197,8 @@ def main():
     for config in configs:
         ms=timings[config.name]
         rows.append({'configuration':config.name,'steps':config.steps,
+            'schedule_power':config.schedule_power,
+            'actual_forward_calls_per_batch':passes[config.name],
             'network_passes_per_image':passes[config.name],
             'guided_velocity_evaluations':passes[config.name]//2,
             'batch_size':batch,'median_batch_ms':statistics.median(ms),

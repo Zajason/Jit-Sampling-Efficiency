@@ -11,12 +11,15 @@ This project tests whether existing numerical sampling methods can generate JiT 
 - [Current two-page proposal](docs/jit-sampling-efficiency/proposal.pdf)
 - [Editable proposal source](docs/jit-sampling-efficiency/build_proposal.py)
 - [Earlier full revised draft](docs/jit-sampling-efficiency/original-revised-proposal.md)
+- [Six-slide research presentation](docs/jit-sampling-efficiency/presentation.pptx)
+- [Measured preliminary results](docs/experiment-results.md)
+- [Archived result data, figures and paired grids](docs/experiment-artifacts/2026-11-05/README.md)
 
 ## What the pilot does
 
 The pretrained network, guidance calculation, and Euler/Heun step functions come directly from the author-maintained [LTH14/JiT](https://github.com/LTH14/JiT) repository. A minimal upstream snapshot is pinned by commit and file hashes in `configs/upstream.json`; upstream files are never edited. This is the authors' PyTorch/GPU reimplementation; their original paper implementation used JAX/TPU.
 
-Only the sampling loop for Adams–Bashforth 2 (AB2) is new. It starts with Euler and then reuses the previous velocity. All six configurations use uniform timesteps, first-EMA checkpoint weights, CFG 3.0 with interval (0.1, 1.0), and the upstream denominator clamp `t_eps=0.05`. Guidance is not optimized away outside its active interval, matching upstream compute behavior. The guidance switch and denominator clamp can make the dynamics nonsmooth; higher numerical order is therefore not a guarantee of better images.
+The sampling loop for Adams–Bashforth 2 (AB2) is an explicitly identified addition. It starts with Euler and then reuses the previous velocity. All six original pilot configurations use uniform timesteps, first-EMA checkpoint weights, CFG 3.0 with interval (0.1, 1.0), and the upstream denominator clamp `t_eps=0.05`. The full proposal study below adds separately identified fixed nonuniform-grid ablations. Guidance is not optimized away outside its active interval, matching upstream compute behavior. The guidance switch and denominator clamp can make the dynamics nonsmooth; higher numerical order is therefore not a guarantee of better images.
 
 | Configuration | Steps | Guided velocity evaluations | Network passes/image |
 |---|---:|---:|---:|
@@ -107,6 +110,41 @@ The optional FID installer uses the pinned author-maintained `LTH14/torch-fideli
 
 If only fewer-step Euler/Heun works, the project still yields a useful quality–latency comparison. If AB2 fails, report that rather than tuning on final test seeds. Nonuniform schedule experiments come after this baseline pilot.
 
+## Full proposal study
+
+`configs/solver-budgets.json` extends the original uniform pilot to nominal
+10, 20, 30, 50 and 100 sample-equivalent network passes per image. Heun uses
+the nearest feasible count at or below the budget; the exact mapping is saved
+in the config. The official Heun-50 reference remains a separate 198-pass point.
+Additional configurations explicitly record their method, steps and schedule
+power. Nonuniform schedules use `t = u ** power` and the same official step
+functions; they are identified ablations, not official sampler parity claims.
+
+The sequential study runner performs the 2,000-image uniform screen, then
+validation-only schedule selection with a fixed solver, and freezes finalists
+before two independent 5,000-image evaluations. Read
+[the execution protocol](docs/experiment-protocol.md) for the predeclared
+selection rules, seeds, timing boundary and sample-size limitations.
+
+```bash
+python scripts/run_study.py \
+  --checkpoint checkpoints/jit-b-16.pth \
+  --output results/study-NEW
+python scripts/export_study.py \
+  --study results/study-NEW --pilot results/pilot-NEW \
+  --output results/presentation-NEW
+python scripts/capture_intermediates.py \
+  --study results/study-NEW --checkpoint checkpoints/jit-b-16.pth \
+  --output results/intermediates-NEW
+```
+
+Run the original LPIPS-enabled pilot first and inspect its paired grid.
+The exporter additionally requires `matplotlib`; it creates PNG, SVG and PDF
+figures, a consolidated CSV and presentation notes. Intermediate conditional
+predictions are captured separately, outside all sampler timing.
+Every output directory must be new. `status.json`, stage logs, per-stage
+manifests and `selection.json` make progress and selection inspectable.
+
 ## Structure
 
 ```text
@@ -120,4 +158,10 @@ checkpoints/             Downloaded pretrained checkpoint; ignored by Git
 results/                 Actual experiment outputs; ignored by Git
 ```
 
-No pretrained-image benchmarks have been run during project setup. See `docs/validation.md` for the tests performed and execution requirements.
+The original project setup used analytic tests only. A pretrained 64-image
+pilot was completed on the RTX 5080 on 5 November 2026; see
+`docs/validation.md` for the distinction between those results and the setup
+tests. The 16-configuration uniform screen and four-configuration schedule
+validation also completed: [measured results and remaining work](docs/experiment-results.md).
+Final evaluations await CUDA driver recovery. Larger study results must be
+read from their completed run manifests.

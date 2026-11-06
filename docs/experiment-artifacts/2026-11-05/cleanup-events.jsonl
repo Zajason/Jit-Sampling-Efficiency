@@ -1,0 +1,1 @@
+{"stage": "schedule-validation", "reason": "Generation manifest, summary, grid and report complete; interpreter stalled in shutdown. Stopped own generation process and its remaining helper processes, replaced supervisor with cleanup-aware resume. No outputs overwritten; no sampler timing includes cleanup."}

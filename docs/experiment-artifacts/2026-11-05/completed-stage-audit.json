@@ -1,0 +1,30 @@
+{
+  "status": "partial-study-completed-stages-verified",
+  "completed": [
+    {
+      "run": "/mnt/research/jit-sampling/results/pilot-20261105-001",
+      "configurations": 6,
+      "samples_per_configuration": 64,
+      "seed": 20261105
+    },
+    {
+      "run": "/mnt/research/jit-sampling/results/study-20261105-001/uniform-screen",
+      "configurations": 16,
+      "samples_per_configuration": 2000,
+      "seed": 20261106
+    },
+    {
+      "run": "/mnt/research/jit-sampling/results/study-20261105-001/schedule-validation",
+      "configurations": 4,
+      "samples_per_configuration": 2000,
+      "seed": 20271106
+    }
+  ],
+  "pending": [
+    "final-1",
+    "final-2",
+    "untimed intermediate predictions"
+  ],
+  "total_images": 40384,
+  "checkpoint_sha256": "4ebcf24698748548d13bef1b4c3b26c72c6ec2bc633002b3f558697920cb2695"
+}

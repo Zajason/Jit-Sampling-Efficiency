@@ -82,4 +82,22 @@ class OfficialParityTests(unittest.TestCase):
             self.assertTrue(torch.isfinite(result).all())
             torch.testing.assert_close(z,copy,rtol=0,atol=0)
 
+    def test_nonuniform_grids_integrate_linear_time_velocity(self):
+        model=self.fake_model()
+        model._forward_sample=lambda z,t,y: (2*t+3).expand_as(z)
+        labels=torch.tensor([3,93]);z=torch.zeros(2,3,4,4)
+        for power in [.5,2.]:
+            grid=torch.linspace(0.,1.,26).pow(power)
+            for method in ['euler','heun','ab2']:
+                actual=sample(model,z,labels,Configuration('test',method,25,power))
+                h=grid[1:]-grid[:-1]
+                if method=='euler': expected=float(((2*grid[:-1]+3)*h).sum())
+                elif method=='heun': expected=4-float(h[-1]**2)
+                else: expected=4-float(h[0]**2)
+                torch.testing.assert_close(actual,torch.full_like(z,expected),rtol=1e-5,atol=1e-5)
+
+    def test_invalid_schedules_are_rejected(self):
+        for power in [0,-1,float('nan'),float('inf')]:
+            with self.assertRaises(ValueError):Configuration('bad','ab2',25,power)
+
 if __name__=='__main__':unittest.main()

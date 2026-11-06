@@ -12,6 +12,7 @@ dependencies = ["torch>=2.7", "numpy>=1.26", "Pillow>=10", "einops>=0.8"]
 [project.optional-dependencies]
 perceptual = ["lpips>=0.1.4", "torchvision>=0.22"]
 proposal = ["reportlab>=4"]
+analysis = ["matplotlib>=3.10"]
 
 [project.scripts]
 jit-pilot = "jit_pilot.run:main"
